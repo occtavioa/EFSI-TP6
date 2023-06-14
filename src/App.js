@@ -7,6 +7,8 @@ function App() {
   const [paises, setPaises] = useState([]);
   const [paisRandom, setPaisRandom] = useState({});
   const [puntos, setPuntos] = useState(0);
+  const [timer, setTimer] = useState(15);
+  // const []
   const pResultado = document.getElementById('resultado');
 
   useEffect(() => {
@@ -33,11 +35,18 @@ function App() {
     //document.getElementById('imgPais').src=paisRandom.flag;
   }, [paisRandom])
   useEffect(() => {
-    setTimeout(() => {
-      // document.getElementById('timer').innerText=''
-      console.log('a');
-    }, 1000)
-  })
+    if(timer == 0) {
+      setTimer(15);
+      setPaisRandom(
+        paises[Math.round(Math.random()*220)]
+      );
+    } else {
+      setTimeout(() => {
+        setTimer(timer-1);
+      }, 1000);
+      console.log(timer);
+    }
+  }, [timer])
   return (
     <div className="App">
       { paisRandom ? <img id="imgPais" src={paisRandom.flag} /> : <div></div> } 
@@ -45,7 +54,7 @@ function App() {
         e.preventDefault();
         console.log(e.target.elements["pais"].value);
         if(e.target.elements["pais"].value == paisRandom.name) {
-          setPuntos(puntos+10);
+          setPuntos(puntos+10+timer);
           pResultado.style.color='green';
           pResultado.innerText='Bien';
           console.log("bien");
@@ -64,7 +73,7 @@ function App() {
       </form>
       <p>Puntos: {puntos}</p>
       <p id='resultado'></p>
-      <p id="timer"></p>
+      <p>{timer}</p>
     </div>
   );
 }
