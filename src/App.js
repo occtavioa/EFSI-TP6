@@ -6,6 +6,7 @@ import axios from 'axios';
 function App() {
   const [paises, setPaises] = useState([]);
   const [paisRandom, setPaisRandom] = useState({});
+  const [puntos, setPuntos] = useState(0);
   useEffect(() => {
     axios.get('https://countriesnow.space/api/v0.1/countries/flag/images')
       .then(function (response) {
@@ -21,27 +22,30 @@ function App() {
   }, [])
   useEffect(() => {
     setPaisRandom(
-      paises[0]
+      paises[Math.round(Math.random()*220)]
     )
-    console.log(paises);
   }, [paises])
-  console.log(paisRandom);
+  useEffect(() => {
+    console.log(paises);
+    console.log(paisRandom);
+  }, [paisRandom])
   return (
     <div className="App">
-      <header className="App-header">
-        {/* <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a> */}
-      </header>
+      <form onSubmit={(e) => {
+        e.preventDefault();
+        console.log(e.target.elements["pais"].value);
+        if(e.target.elements["pais"].value == paisRandom.name) {
+          setPuntos(puntos+10);
+          console.log("bien");
+        } else {
+          setPuntos(puntos-1);
+          console.log("mal");
+        }
+      }}>
+        <input type={"text"} name={"pais"}></input>
+        <input type={"submit"} value={"comprobar"}></input> 
+      </form>
+      <p>Puntos: {puntos}</p>
     </div>
   );
 }
