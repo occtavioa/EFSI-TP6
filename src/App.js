@@ -1,4 +1,3 @@
-import logo from './logo.svg';
 import './App.css';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
@@ -8,7 +7,8 @@ function App() {
   const [paisRandom, setPaisRandom] = useState({});
   const [puntos, setPuntos] = useState(0);
   const [timer, setTimer] = useState(15);
-  // const []
+  const [correcto, setCorrect] = useState(false);
+  const [ref, setRef] = useState();
   const pResultado = document.getElementById('resultado');
 
   useEffect(() => {
@@ -27,33 +27,35 @@ function App() {
   useEffect(() => {
     setPaisRandom(
       paises[Math.round(Math.random()*220)]
-    )
+    );
   }, [paises])
   useEffect(() => {
     console.log(paises);
     console.log(paisRandom);
-    //document.getElementById('imgPais').src=paisRandom.flag;
   }, [paisRandom])
   useEffect(() => {
     if(timer == 0) {
       setTimer(15);
+      clearTimeout(ref);
       setPaisRandom(
         paises[Math.round(Math.random()*220)]
       );
     } else {
-      setTimeout(() => {
+      setRef(setTimeout(() => {
         setTimer(timer-1);
-      }, 1000);
-      console.log(timer);
+      }, 1000));
     }
   }, [timer])
+  useEffect(() => {
+    setTimer(0)
+  }, [correcto])
   return (
     <div className="App">
       { paisRandom ? <img id="imgPais" src={paisRandom.flag} /> : <div></div> } 
       <form onSubmit={(e) => {
         e.preventDefault();
         console.log(e.target.elements["pais"].value);
-        if(e.target.elements["pais"].value == paisRandom.name) {
+        if(e.target.elements["pais"].value === paisRandom.name) {
           setPuntos(puntos+10+timer);
           pResultado.style.color='green';
           pResultado.innerText='Bien';
@@ -61,6 +63,7 @@ function App() {
           setPaisRandom(
             paises[Math.round(Math.random()*220)]
           )
+          setCorrect(!correcto);
         } else {
           setPuntos(puntos-1);
           pResultado.style.color='red';
@@ -73,7 +76,14 @@ function App() {
       </form>
       <p>Puntos: {puntos}</p>
       <p id='resultado'></p>
+      <button onClick={(e) => {
+        let letra = paisRandom.name[Math.round(Math.random()*paisRandom.name.length)]
+        setTimer(timer-2);
+        document.getElementById('ayuda').innerText=letra;
+      }}></button>
+      <p id='ayuda'></p>
       <p>{timer}</p>
+      { paisRandom ? <p>{paisRandom.name}</p> : <></>} 
     </div>
   );
 }
