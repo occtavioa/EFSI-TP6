@@ -1,10 +1,16 @@
 import './App.css';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import Formulario from './Components/Formulario';
+import Puntos from './Components/Puntos';
+import ResultadoRta from './Components/ResultadoRta';
+import ImgPais from './Components/ImgPais';
+import Timer from './Components/Timer';
+import NombrePaisRandom from './Components/NombrePaisRandom';
 
 function App() {
   const [paises, setPaises] = useState([]);
-  const [paisRandom, setPaisRandom] = useState({});
+  const [paisRandom, setPaisRandom] = useState();
   const [esCorrecta, setEsCorrecta] = useState(undefined);
   const [puntos, setPuntos] = useState(0);
   const [timer, setTimer] = useState(15);
@@ -25,19 +31,15 @@ function App() {
   }, [])
   useEffect(() => {
     setPaisRandom(
-      paises[Math.round(Math.random() * 220)]
+      paises[Math.round(Math.random() * paises.length)]
     );
   }, [paises])
   useEffect(() => {
-    console.log(paises);
-    console.log(paisRandom);
-  }, [paisRandom])
-  useEffect(() => {
-    if (timer == 0) {
+    if (timer === 0) {
       setTimer(15);
       clearTimeout(ref);
       setPaisRandom(
-        paises[Math.round(Math.random() * 220)]
+        paises[Math.round(Math.random() * paises.length)]
       );
     } else {
       setRef(setTimeout(() => {
@@ -45,34 +47,29 @@ function App() {
       }, 1000));
     }
   }, [timer])
+  function rtaCorrecta() {
+    setEsCorrecta(true)
+    setPuntos(puntos+10+timer)
+    setTimer(0)
+  }
+  function rtaIncorrecta() {
+    setPuntos(puntos-1)
+    setEsCorrecta(false)
+  }
   return (
     <div className="App">
-      {paisRandom ? <img id="imgPais" src={paisRandom.flag} /> : <div></div>}
-      <form onSubmit={(e) => {
-        e.preventDefault();
-        console.log(e.target.elements["pais"].value);
-        if (e.target.elements["pais"].value === paisRandom.name) {
-          setPuntos(puntos + 10 + timer);
-          setEsCorrecta(true);
-          setTimer(0);
-        } else {
-          setEsCorrecta(false);
-          setPuntos(puntos - 1);
-        }
-      }}>
-        <input type={"text"} name={"pais"}></input>
-        <input type={"submit"} value={"comprobar"}></input>
-      </form>
-      <p>Puntos: {puntos}</p>
-      <p>
-        {esCorrecta === undefined ?
-          <></> :
-          esCorrecta ?
-            <span style={{ color: 'green' }}>Bien</span> :
-            <span style={{ color: 'red' }}>Mal</span>}
-      </p>
-      <p>{timer}</p>
-      {paisRandom ? <p>{paisRandom.name}</p> : <></>}
+      {paisRandom !== undefined ?
+        <>
+          <ImgPais nombrePais={paisRandom.name} urlFlag={paisRandom.flag}/>
+          <Formulario rtaCorrecta={rtaCorrecta} rtaIncorrecta={rtaIncorrecta} nombrePaisRandom={paisRandom.name} />
+        </> :
+        <></>}
+      <Puntos puntos={puntos}></Puntos>
+      {esCorrecta === undefined ?
+        <></> :
+        <ResultadoRta res={esCorrecta}/>}
+      <Timer timer={timer}/>
+      {paisRandom !== undefined ? <NombrePaisRandom nombre={paisRandom.name}/> : <></>}
     </div>
   );
 }
